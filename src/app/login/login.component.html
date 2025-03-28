@@ -1,0 +1,11 @@
+<form class="form" (ngSubmit)="iniciarSesion()">
+    <p class="heading">LOGIN</p>
+    <input [(ngModel)]="usuario" name="usuario" placeholder="Username" class="input" type="text">
+    <input [(ngModel)]="contrasena" name="contrasena" placeholder="Password" class="input" type="password">
+    <button class="btn" type="submit">Submit</button>
+    <div class="form-footer">
+      <a routerLink="/signup">Sign up</a>
+      <a routerLink="/register">Register</a>
+    </div>
+    <p *ngIf="mensajeError" class="error-message">{{mensajeError}}</p>
+  </form>
