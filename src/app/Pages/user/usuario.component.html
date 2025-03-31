@@ -1,0 +1,54 @@
+<!-- usuario.component.html -->
+<div *ngIf="currentUser" class="max-w-4xl mx-auto my-8 p-8 bg-white rounded-lg shadow-md">
+  <div class="flex justify-between items-center pb-4 mb-8 border-b border-gray-200">
+    <h1 class="text-3xl font-bold text-gray-800">Mi Perfil</h1>
+    <button 
+      (click)="logout()" 
+      class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+    >
+      Cerrar Sesión
+    </button>
+  </div>
+  
+  <div class="flex flex-col md:flex-row gap-8">
+    <div class="flex-1 text-center">
+      <div class="w-32 h-32 mx-auto mb-4 bg-indigo-600 text-white rounded-full flex items-center justify-center text-5xl font-bold">
+        {{ currentUser.name.charAt(0) }}{{ currentUser.lastname.charAt(0) }}
+      </div>
+      <h2 class="text-2xl font-semibold text-gray-800">{{ currentUser.name }} {{ currentUser.lastname }}</h2>
+      <p *ngIf="currentUser.isPremium" class="mt-2 text-yellow-500 font-bold">⭐ Premium</p>
+    </div>
+    
+    <div class="flex-2 space-y-6">
+      <div>
+        <span class="block font-medium text-gray-600 mb-1">Nombre:</span>
+        <span class="text-lg">{{ currentUser.name }}</span>
+      </div>
+      
+      <div>
+        <span class="block font-medium text-gray-600 mb-1">Apellido:</span>
+        <span class="text-lg">{{ currentUser.lastname }}</span>
+      </div>
+      
+      <div>
+        <span class="block font-medium text-gray-600 mb-1">Email:</span>
+        <span class="text-lg">{{ currentUser.email }}</span>
+      </div>
+      
+      <div>
+        <span class="block font-medium text-gray-600 mb-1">Estado:</span>
+        <span class="text-lg">{{ currentUser.isPremium ? 'Premium' : 'Básico' }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="!currentUser" class="text-center mt-12">
+  <p class="text-lg mb-4">No has iniciado sesión</p>
+  <a 
+    routerLink="/login" 
+    class="text-indigo-600 font-bold hover:text-indigo-800 hover:underline"
+  >
+    Iniciar sesión
+  </a>
+</div>

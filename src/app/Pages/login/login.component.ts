@@ -1,8 +1,11 @@
+//login.component.ts
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { UsuarioService } from '../../services/usuario.services';
+import { LoginData } from '../../interfaces/usuario.interface';
 
 @Component({
   selector: 'app-login',
@@ -11,22 +14,41 @@ import { RouterModule } from '@angular/router';
   templateUrl: './login.component.html',
 })
 export class LoginComponent {
-  usuario: string = '';
-  contrasena: string = '';
+  credentials: LoginData = {
+    email: '',
+    password: ''
+  };
   mensajeError: string = '';
+  isLoading: boolean = false;
 
-  // Credenciales válidas (en producción usar un servicio)
-  private usuarioValido = 'romi';
-  private contrasenaValida = '1234';
-
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private usuarioService: UsuarioService
+  ) {}
 
   iniciarSesion() {
-    if (this.usuario === this.usuarioValido && this.contrasena === this.contrasenaValida) {
-      this.mensajeError = '';
-      this.router.navigate(['/admin']);
-    } else {
-      this.mensajeError = 'Usuario o contraseña incorrectos';
-    }
+    this.isLoading = true;
+    this.mensajeError = '';
+    
+    this.usuarioService.login(this.credentials).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        
+        // Redirigir según el rol
+        if (response.user.roleId === 1) {
+          this.router.navigate(['/admin']);
+        } else if (response.user.roleId === 2) {
+          this.router.navigate(['/user']);
+        } else {
+          // Rol no reconocido, redirigir a home
+          this.router.navigate(['/']);
+        }
+      },
+      error: (error) => {
+        this.isLoading = false;
+        this.mensajeError = 'Email o contraseña incorrectos';
+        console.error('Error en el login:', error);
+      }
+    });
   }
 }

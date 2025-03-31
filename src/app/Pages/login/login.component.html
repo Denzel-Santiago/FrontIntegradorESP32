@@ -1,3 +1,4 @@
+<!-- login.component.html -->
 <!-- Navegación -->
 <nav class="bg-[#4C270A] py-4 px-6 flex justify-between items-center">
   <img src="assets/logo2.png" alt="Logo" class="h-12">
@@ -37,28 +38,32 @@
       <div class="flex flex-col gap-1">
         <label class="text-[#4C270A] text-sm">Email</label>
         <input 
-          [(ngModel)]="usuario" 
-          name="usuario" 
-          type="text"
+          [(ngModel)]="credentials.email" 
+          name="email" 
+          type="email"
           class="outline-none p-3 border border-[#DAA06D] text-[#4C270A] w-full rounded-xl bg-white box-border"
+          required
         >
       </div>
       
       <div class="flex flex-col gap-1">
         <label class="text-[#4C270A] text-sm">Password</label>
         <input 
-          [(ngModel)]="contrasena" 
-          name="contrasena" 
+          [(ngModel)]="credentials.password" 
+          name="password" 
           type="password"
           class="outline-none p-3 border border-[#DAA06D] text-[#4C270A] w-full rounded-xl bg-white box-border"
+          required
         >
       </div>
       
       <button 
         type="submit"
         class="rounded-xl border-none text-white bg-[#E5AA70] font-bold tracking-[0.1em] p-3 w-full cursor-pointer shadow-[0.5px_0.5px_0.5px_0.5px_rgba(0,0,0,0.5)] mt-3 transition-all duration-300 hover:opacity-80 active:translate-x-1 active:translate-y-1 active:shadow-none"
+        [disabled]="isLoading"
       >
-        Sign in
+        <span *ngIf="!isLoading">Sign in</span>
+        <span *ngIf="isLoading">Processing...</span>
       </button>
       
       <div class="flex justify-between mt-3">
