@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuarios - C.A.F</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#E5DCD3] flex h-screen m-0">
+    <!-- Sidebar -->
+    <app-sidebar class="fixed left-0 top-0 h-full"></app-sidebar>
+
+    <!-- Contenedor Principal -->
+    <div class="flex-1 flex flex-col min-h-screen ml-48">  <!-- ml-48 para el espacio del sidebar -->
+        <!-- Navegación Superior modificada -->
+        <nav class="bg-[#351F0A] py-4 px-6 flex items-center justify-between">
+            <img src="assets/logo2.png" alt="Logo" class="h-12">
+            <h1 class="text-white text-2xl font-bold text-center flex-1">LUZ</h1>
+        </nav>
+
+        <!-- Contenido Principal -->
+        <div class="flex-1 px-4 py-4 md:py-8">
+            <!-- Contenido de usuarios -->
+            <div *ngIf="currentUser" class="max-w-4xl mx-auto p-8 bg-white rounded-lg shadow-md">
+                
+                
+                <div class="flex flex-col md:flex-row gap-8">
+                    <div class="flex-1 text-center">
+                        <div class="w-32 h-32 mx-auto mb-4 bg-indigo-600 text-white rounded-full flex items-center justify-center text-5xl font-bold">
+                            {{ currentUser.name.charAt(0) }}{{ currentUser.lastname.charAt(0) }}
+                        </div>
+                        <h2 class="text-2xl font-semibold text-gray-800">{{ currentUser.name }} {{ currentUser.lastname }}</h2>
+                        <p *ngIf="currentUser.isPremium" class="mt-2 text-yellow-500 font-bold">⭐ Premium</p>
+                    </div>
+                    
+                    <div class="flex-2 space-y-6">
+                        <div>
+                            <span class="block font-medium text-gray-600 mb-1">Nombre:</span>
+                            <span class="text-lg">{{ currentUser.name }}</span>
+                        </div>
+                        
+                        <div>
+                            <span class="block font-medium text-gray-600 mb-1">Apellido:</span>
+                            <span class="text-lg">{{ currentUser.lastname }}</span>
+                        </div>
+                        
+                        <div>
+                            <span class="block font-medium text-gray-600 mb-1">Email:</span>
+                            <span class="text-lg">{{ currentUser.email }}</span>
+                        </div>
+                        
+                        <div>
+                            <span class="block font-medium text-gray-600 mb-1">Estado:</span>
+                            <span class="text-lg">{{ currentUser.isPremium ? 'Premium' : 'Básico' }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+           
+        </div>
+
+    </div>
+</body>
+</html>

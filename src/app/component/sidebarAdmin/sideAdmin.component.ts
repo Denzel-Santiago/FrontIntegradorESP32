@@ -3,9 +3,9 @@ import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
-  selector: 'app-sidebar',
+  selector: 'app-sideAdmin',
   standalone: true,
   imports: [RouterLink, CommonModule],
-  templateUrl: './sidebar.component.html',
+  templateUrl: './sideAdmin.component.html',
 })
-export class SidebarComponent {}
+export class SideAdminComponent {}

@@ -6,11 +6,21 @@ import { LoginComponent } from './Pages/login/login.component';
 import { AdminComponent } from './Pages/admin/admin.component';
 import { UsuarioComponent } from './Pages/user/usuario.component';
 import { AuthGuard } from './AuthGuard/auth.guard';
+import { temperaturaComponent } from './Pages/Temperatura/temperatura.component';
+import { LuzComponent } from './Pages/Luz/luz.component';
+import { HumedadComponent } from './Pages/Humedad/humedad.component';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
     { path: 'ventas', component: VentasComponent },
     { path: 'login', component: LoginComponent},
+    { path: 'temperatura', component: temperaturaComponent},
+    { path: 'luz', component: LuzComponent},
+    { path: 'humedad', component: HumedadComponent},
+
+    
+
+
     { 
       path: 'admin', 
       component: AdminComponent,

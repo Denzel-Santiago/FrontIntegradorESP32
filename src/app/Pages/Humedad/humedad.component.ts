@@ -6,12 +6,12 @@ import { Usuario } from '../../interfaces/usuario.interface';
 import { SidebarComponent } from "../../component/sidebar/sidebar.component";
 
 @Component({
-  selector: 'app-usuario',
+  selector: 'app-humedad',
   standalone: true,
   imports: [CommonModule, SidebarComponent],
-  templateUrl: './usuario.component.html',
+  templateUrl: './humedad.component.html',
 })
-export class UsuarioComponent {
+export class HumedadComponent {
   currentUser: Usuario | null = null;
 
   constructor(private router: Router) {
