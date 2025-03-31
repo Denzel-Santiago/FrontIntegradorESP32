@@ -11,7 +11,6 @@ import {
 } from '@angular/forms';
 import { Usuario, UsuarioCreate, UsuarioUpdate } from '../../interfaces/usuario.interface';
 import { UsuarioService } from '../../services/usuario.services';
-import { SidebarComponent } from '../../component/sidebar/sidebar.component';
 import { SideAdminComponent } from "../../component/sidebarAdmin/sideAdmin.component";
 
 @Component({
@@ -24,7 +23,6 @@ import { SideAdminComponent } from "../../component/sidebarAdmin/sideAdmin.compo
     ReactiveFormsModule,
     FormsModule,
     NgIf,
-    SidebarComponent,
     SideAdminComponent
 ]
 })

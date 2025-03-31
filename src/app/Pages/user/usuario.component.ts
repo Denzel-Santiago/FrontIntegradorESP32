@@ -3,12 +3,12 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Usuario } from '../../interfaces/usuario.interface';
-import { SidebarComponent } from "../../component/sidebar/sidebar.component";
+
 
 @Component({
   selector: 'app-usuario',
   standalone: true,
-  imports: [CommonModule, SidebarComponent],
+  imports: [CommonModule],
   templateUrl: './usuario.component.html',
 })
 export class UsuarioComponent {
