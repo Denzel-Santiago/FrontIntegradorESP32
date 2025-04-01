@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Usuarios - C.A.F</title>
+    <title>Humedad - C.A.F</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-[#E5DCD3] flex h-screen m-0">
@@ -11,15 +11,54 @@
     <app-sidebar class="fixed left-0 top-0 h-full"></app-sidebar>
 
     <!-- Contenedor Principal -->
-    <div class="flex-1 flex flex-col min-h-screen ml-48">  <!-- ml-48 para el espacio del sidebar -->
-        <!-- Navegación Superior modificada -->
+    <div class="flex-1 flex flex-col min-h-screen ml-48">
+        <!-- Navegación Superior -->
         <nav class="bg-[#351F0A] py-4 px-6 flex items-center justify-between">
             <img src="assets/logo2.png" alt="Logo" class="h-12">
-            <h1 class="text-white text-2xl font-bold text-center flex-1">HUMEDAD</h1>
+            <h1 class="text-white text-2xl font-bold text-center flex-1">MONITOR DE HUMEDAD</h1>
         </nav>
 
         <!-- Contenido Principal -->
+        <div class="flex-1 p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Panel Humedad Actual -->
+            <div class="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center justify-center border border-[#4C270A]/20">
+                <h2 class="text-xl font-bold mb-4 text-[#4C270A]">Humedad Actual</h2>
+                <div class="text-5xl font-bold text-[#4C270A] mb-2">{{currentHumidity}}%</div>
+                <div class="text-lg px-4 py-2 rounded-full 
+                    {{status === 'Óptima' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}}">
+                    {{status}}
+                </div>
+            </div>
 
+            <!-- Panel Rango Ideal -->
+            <div class="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center justify-center border border-[#4C270A]/20">
+                <h2 class="text-xl font-bold mb-4 text-[#4C270A]">Rango Ideal</h2>
+                <div class="text-3xl font-bold text-[#4C270A]">
+                    {{idealHumidityRange.min}}% - {{idealHumidityRange.max}}%
+                </div>
+                <div class="w-full mt-6">
+                    <div class="flex justify-between text-sm text-gray-600 mb-1">
+                        <span>50%</span>
+                        <span>80%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-4">
+                        <div class="bg-[#4C270A] h-4 rounded-full" 
+                            [style.width]="((currentHumidity - 50) / 30 * 100) + '%'"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfica - Contenedor con altura fija -->
+            <div class="lg:col-span-2 bg-white rounded-xl shadow-lg p-6 border border-[#4C270A]/20 h-[400px]">
+                <div class="chart-container h-full">
+                  <canvas baseChart
+                          [data]="humidityChartData"
+                          [options]="chartOptions"
+                          [type]="'line'">
+                  </canvas>
+                </div>
+              </div>
+        </div>
     </div>
 </body>
 </html>
