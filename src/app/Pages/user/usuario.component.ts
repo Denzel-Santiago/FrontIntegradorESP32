@@ -6,10 +6,10 @@ import { Usuario } from '../../interfaces/usuario.interface';
 
 
 @Component({
-  selector: 'app-usuario',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './usuario.component.html',
+    selector: 'app-usuario',
+    imports: [CommonModule],
+    standalone: true,
+    templateUrl: './usuario.component.html'
 })
 export class UsuarioComponent {
   currentUser: Usuario | null = null;

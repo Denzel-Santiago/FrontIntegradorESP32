@@ -6,10 +6,10 @@ import { Usuario } from '../../interfaces/usuario.interface';
 import { SidebarComponent } from "../../component/sidebar/sidebar.component";
 
 @Component({
-  selector: 'app-Luz',
-  standalone: true,
-  imports: [CommonModule, SidebarComponent],
-  templateUrl: './luz.component.html',
+    selector: 'app-Luz',
+    imports: [CommonModule, SidebarComponent],
+    standalone: true,
+    templateUrl: './luz.component.html'
 })
 export class LuzComponent {
   currentUser: Usuario | null = null;

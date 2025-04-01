@@ -6,10 +6,10 @@ import { Usuario } from '../../interfaces/usuario.interface';
 import { SidebarComponent } from "../../component/sidebar/sidebar.component";
 
 @Component({
-  selector: 'app-temperatura',
-  standalone: true,
-  imports: [CommonModule, SidebarComponent],
-  templateUrl: './temperatura.component.html',
+    selector: 'app-temperatura',
+    imports: [CommonModule, SidebarComponent],
+    standalone: true,
+    templateUrl: './temperatura.component.html'
 })
 export class temperaturaComponent {
   currentUser: Usuario | null = null;

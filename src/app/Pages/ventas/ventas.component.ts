@@ -2,11 +2,11 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common'; // Asegúrate de importar esto
 
 @Component({
-  selector: 'app-ventas',
-  templateUrl: './ventas.component.html',
-  styleUrls: ['./ventas.component.css'],
-  standalone: true, // Solo si es un componente standalone
-  imports: [CommonModule] // Solo si es un componente standalone
+    selector: 'app-ventas',
+    templateUrl: './ventas.component.html',
+    styleUrls: ['./ventas.component.css'], // Solo si es un componente standalone
+    standalone: true,
+    imports: [CommonModule] // Solo si es un componente standalone
 })
 export class VentasComponent {
   isModalOpen: boolean = false;

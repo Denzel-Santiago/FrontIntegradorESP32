@@ -14,17 +14,17 @@ import { UsuarioService } from '../../services/usuario.services';
 import { SideAdminComponent } from "../../component/sidebarAdmin/sideAdmin.component";
 
 @Component({
-  selector: 'app-admin',
-  templateUrl: './admin.component.html',
-  standalone: true,
-  imports: [
-    CommonModule,
-    RouterModule,
-    ReactiveFormsModule,
-    FormsModule,
-    NgIf,
-    SideAdminComponent
-]
+    selector: 'app-admin',
+    templateUrl: './admin.component.html',
+    standalone: true,
+    imports: [
+        CommonModule,
+        RouterModule,
+        ReactiveFormsModule,
+        FormsModule,
+        NgIf,
+        SideAdminComponent
+    ]
 })
 export class AdminComponent implements OnInit {
   // Datos

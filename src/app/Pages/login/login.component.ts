@@ -8,10 +8,10 @@ import { UsuarioService } from '../../services/usuario.services';
 import { LoginData } from '../../interfaces/usuario.interface';
 
 @Component({
-  selector: 'app-login',
-  standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
-  templateUrl: './login.component.html',
+    selector: 'app-login',
+    imports: [CommonModule, FormsModule, RouterModule],
+    standalone: true,
+    templateUrl: './login.component.html'
 })
 export class LoginComponent {
   credentials: LoginData = {
