@@ -3,9 +3,9 @@ import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
-    selector: 'app-sidebar',
-    imports: [RouterLink, CommonModule],
-    standalone: true,
-    templateUrl: './sidebar.component.html'
+  selector: 'app-sidebar',
+  standalone: true,
+  imports: [CommonModule, RouterLink],
+  templateUrl: './sidebar.component.html',  // Opcional si necesitas estilos adicionales
 })
 export class SidebarComponent {}

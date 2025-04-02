@@ -21,7 +21,7 @@ export class LuzComponent implements OnInit {
     labels: Array(24).fill(0).map((_, i) => `${i}:00`), // 24 horas
     datasets: [
       {
-        label: 'Humedad Actual',
+        label: 'Luz Actual',
         data: this.generateRandomData(65, 75),
         borderColor: '#4C8BFF',
         backgroundColor: 'rgba(76, 139, 255, 0.2)',
@@ -30,7 +30,7 @@ export class LuzComponent implements OnInit {
         pointRadius: 0 // Para mejor rendimiento con muchos puntos
       },
       {
-        label: 'Humedad Ideal',
+        label: 'Luz Ideal',
         data: Array(24).fill(70),
         borderColor: '#4C270A',
         backgroundColor: 'rgba(76, 39, 10, 0.1)',
