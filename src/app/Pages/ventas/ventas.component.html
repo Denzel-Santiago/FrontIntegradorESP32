@@ -140,82 +140,76 @@
   </div>
 
   <!-- Modal de Compra -->
-  <div *ngIf="isPurchaseModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
-    <div class="bg-white rounded-lg max-w-lg w-full mx-auto overflow-hidden shadow-xl">
-      <div class="p-6">
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="text-lg font-medium text-gray-900">
-            Comprar {{currentProduct ? getNombreTipoCama(currentProduct.tipo_cama_id) : ''}}
-          </h3>
-          <button type="button" (click)="closeModal()" class="text-gray-400 hover:text-gray-500">
-            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+<div *ngIf="isPurchaseModalOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+  <div class="bg-white rounded-lg max-w-lg w-full mx-auto overflow-hidden shadow-xl">
+    <div class="p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-medium text-red-900">
+          Comprar {{ currentProduct ? getNombreTipoCama(currentProduct.tipo_cama_id) : '' }}
+        </h3>
+        <button type="button" (click)="closeModal()" class="text-gray-400 hover:text-gray-500">
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div *ngIf="orderSuccess" class="mb-4 p-4 bg-green-100 text-green-700 rounded">
+        ¡Pedido realizado con éxito! Nos pondremos en contacto contigo pronto.
+      </div>
+      <div *ngIf="orderError" class="mb-4 p-4 bg-red-100 text-red-700 rounded">
+        Error al procesar el pedido. Por favor, inténtalo de nuevo.
+      </div>
+
+      <form *ngIf="!orderSuccess" [formGroup]="orderForm" (ngSubmit)="submitOrder()" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-800">Nombre</label>
+          <input type="text" formControlName="name"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border bg-white text-black">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-800">Apellido</label>
+          <input type="text" formControlName="last_name"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border bg-white text-black">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-800">Teléfono</label>
+          <input type="tel" formControlName="phone"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border bg-white text-black">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-800">Email</label>
+          <input type="email" formControlName="email"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border bg-white text-black">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-800">Cantidad</label>
+          <input type="number" formControlName="quantity" min="1"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border bg-white text-black">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-800">Modelo de Cama</label>
+          <input type="text" formControlName="bed_name" readonly
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border bg-gray-100 text-black">
+        </div>
+
+        <div class="flex justify-end space-x-3 pt-4">
+          <button type="button" (click)="closeModal()" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+            Cancelar
+          </button>
+          <button type="submit"
+            class="px-4 py-2 bg-[#4C270A] text-white rounded-md hover:bg-[#5a3211] disabled:opacity-50"
+            [disabled]="orderForm.invalid">
+            Confirmar Compra
           </button>
         </div>
-        
-        <div *ngIf="orderSuccess" class="mb-4 p-4 bg-green-100 text-green-700 rounded">
-          ¡Pedido realizado con éxito! Nos pondremos en contacto contigo pronto.
-        </div>
-        <div *ngIf="orderError" class="mb-4 p-4 bg-red-100 text-red-700 rounded">
-          Error al procesar el pedido. Por favor, inténtalo de nuevo.
-        </div>
+      </form>
 
-        <form *ngIf="!orderSuccess" [formGroup]="orderForm" (ngSubmit)="submitOrder()" class="space-y-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700">Nombre</label>
-            <input type="text" formControlName="name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border">
-            <div *ngIf="orderForm.get('name')?.invalid && orderForm.get('name')?.touched" class="text-red-500 text-sm mt-1">
-              Nombre es requerido
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700">Apellido</label>
-            <input type="text" formControlName="last_name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border">
-            <div *ngIf="orderForm.get('last_name')?.invalid && orderForm.get('last_name')?.touched" class="text-red-500 text-sm mt-1">
-              Apellido es requerido
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700">Teléfono</label>
-            <input type="tel" formControlName="phone" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border">
-            <div *ngIf="orderForm.get('phone')?.invalid && orderForm.get('phone')?.touched" class="text-red-500 text-sm mt-1">
-              Teléfono válido es requerido (10 dígitos)
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700">Email</label>
-            <input type="email" formControlName="email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border">
-            <div *ngIf="orderForm.get('email')?.invalid && orderForm.get('email')?.touched" class="text-red-500 text-sm mt-1">
-              Email válido es requerido
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-100">Cantidad</label>
-            <input type="number" formControlName="quantity" min="1" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border">
-            <div *ngIf="orderForm.get('quantity')?.invalid && orderForm.get('quantity')?.touched" class="text-red-500 text-sm mt-1">
-              Cantidad mínima: 1
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700">Modelo de Cama</label>
-            <input type="text" formControlName="bed_name" readonly class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border bg-gray-100">
-          </div>
-
-          <div class="flex justify-end space-x-3 pt-4">
-            <button type="button" (click)="closeModal()" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
-              Cancelar
-            </button>
-            <button type="submit" class="px-4 py-2 bg-[#4C270A] text-white rounded-md hover:bg-[#5a3211] disabled:opacity-50" [disabled]="orderForm.invalid">
-              Confirmar Compra
-            </button>
-          </div>
-        </form>
 
         <div *ngIf="orderSuccess" class="flex justify-end pt-4">
           <button (click)="closeModal()" class="px-4 py-2 bg-[#4C270A] text-white rounded-md hover:bg-[#5a3211]">

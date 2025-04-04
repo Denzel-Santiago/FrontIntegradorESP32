@@ -3,14 +3,98 @@
   <app-sideAdmin class="fixed left-0 top-0 h-full"></app-sideAdmin>
 
   <!-- Contenedor Principal -->
-  <div class="flex-1 flex flex-col min-h-screen ml-48">  <!-- IMPORTANTE: ml-48 -->
+  <div class="flex-1 flex flex-col min-h-screen ml-48">
       <!-- Navegación -->
       <nav class="bg-[#4C270A] py-4 px-6 flex items-center justify-between">
           <img src="assets/logo2.png" alt="Logo" class="h-12">
           <h1 class="text-white text-2xl font-bold text-center flex-1">ADMINISTRADOR</h1>
+          
+          <!-- Notification Bell -->
+          <div class="relative">
+            <button 
+              (click)="toggleNotifications()"
+              class="text-white hover:text-gray-200 focus:outline-none relative"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+              <span 
+                *ngIf="newNotificationCount > 0"
+                class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"
+              >
+                {{ newNotificationCount }}
+              </span>
+            </button>
+            
+            <!-- Notification Dropdown -->
+            <div 
+              *ngIf="showNotifications"
+              class="absolute right-0 mt-2 w-72 md:w-96 bg-white rounded-md shadow-lg overflow-hidden z-50"
+            >
+              <div class="p-4 bg-[#4C270A] text-white flex justify-between items-center">
+                <h3 class="font-bold">Notificaciones</h3>
+                <button 
+                  (click)="clearNotifications()"
+                  class="text-xs hover:text-gray-300"
+                >
+                  Limpiar todo
+                </button>
+              </div>
+              
+              <div class="max-h-96 overflow-y-auto">
+                <div 
+                  *ngFor="let notification of notifications"
+                  class="border-b border-gray-200 last:border-b-0"
+                >
+                  <div class="p-4 hover:bg-gray-50">
+                    <div class="flex justify-between items-start">
+                      <div>
+                        <h4 class="font-medium text-gray-800">Nuevo pedido</h4>
+                        <p class="text-sm text-gray-600 mt-1">
+                          <span class="font-semibold">{{ notification.name }} {{ notification.lastName }}</span> ha solicitado {{ notification.quantity }} {{ notification.bedName }}
+                        </p>
+                      </div>
+                      <span class="text-xs text-gray-500 whitespace-nowrap ml-2">Ahora</span>
+                    </div>
+                    <div class="mt-2 text-sm">
+                      <p><span class="font-medium">Email:</span> {{ notification.email }}</p>
+                      <p><span class="font-medium">Teléfono:</span> {{ notification.phone }}</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div 
+                  *ngIf="notifications.length === 0"
+                  class="p-4 text-center text-gray-500"
+                >
+                  No hay notificaciones
+                </div>
+              </div>
+            </div>
+          </div>
       </nav>
 
-      <!-- Contenido Principal SIN margen extra -->
+      <!-- Toast Notifications Container -->
+      <div class="fixed bottom-4 right-4 space-y-2 z-50">
+        <div 
+          *ngFor="let notification of notifications.slice(0, 3)"
+          class="bg-white border-l-4 border-blue-500 rounded shadow-lg p-4 w-72 md:w-80 flex items-start transition-all duration-300"
+        >
+          <div class="flex-shrink-0 text-blue-500 mr-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <div>
+            <h4 class="font-medium text-gray-800">Nuevo pedido</h4>
+            <p class="text-sm text-gray-600 mt-1">
+              {{ notification.name }} {{ notification.lastName }} - {{ notification.bedName }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contenido Principal -->
       <div class="flex-1 px-4 py-4 md:py-8">
           <!-- Aquí va el contenido -->
              <!-- Contenedor Principal -->
@@ -293,7 +377,5 @@
   </div>
 </div>
       </div>
-
-      
   </div>
 </body>

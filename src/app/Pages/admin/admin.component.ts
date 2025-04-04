@@ -1,5 +1,5 @@
 // admin.component.ts
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule, NgIf } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { 
@@ -12,6 +12,9 @@ import {
 import { Usuario, UsuarioCreate, UsuarioUpdate } from '../../interfaces/usuario.interface';
 import { UsuarioService } from '../../services/usuario.services';
 import { SideAdminComponent } from "../../component/sidebarAdmin/sideAdmin.component";
+import { ConsumerService } from '../../services/consumer.service';
+import { Subscription } from 'rxjs';
+import { Order } from '../../interfaces/consumer.interface';
 
 @Component({
     selector: 'app-admin',
@@ -26,7 +29,7 @@ import { SideAdminComponent } from "../../component/sidebarAdmin/sideAdmin.compo
         SideAdminComponent
     ]
 })
-export class AdminComponent implements OnInit {
+export class AdminComponent implements OnInit, OnDestroy {
   // Datos
   users: Usuario[] = [];
   
@@ -46,20 +49,62 @@ export class AdminComponent implements OnInit {
   // Formularios
   userForm!: FormGroup;
 
+  // WebSocket notifications
+  notifications: Order[] = [];
+  showNotifications = false;
+  newNotificationCount = 0;
+  private wsSubscription!: Subscription;
+
   constructor(
     private usuarioService: UsuarioService,
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private consumerService: ConsumerService
   ) {
     this.initForms();
   }
 
   ngOnInit(): void {
     this.loadUsers();
+    this.setupWebSocket();
+  }
+
+  ngOnDestroy(): void {
+    if (this.wsSubscription) {
+      this.wsSubscription.unsubscribe();
+    }
+  }
+
+  private setupWebSocket(): void {
+    this.wsSubscription = this.consumerService.getMessages().subscribe({
+      next: (order: Order) => {
+        this.notifications.unshift(order);
+        this.newNotificationCount++;
+        
+        // Auto-hide notification after 5 seconds
+        setTimeout(() => {
+          if (this.notifications.length > 0 && this.notifications[0] === order) {
+            this.notifications.shift();
+          }
+        }, 5000);
+      },
+      error: (err) => console.error('WebSocket error:', err)
+    });
+  }
+
+  toggleNotifications(): void {
+    this.showNotifications = !this.showNotifications;
+    if (this.showNotifications) {
+      this.newNotificationCount = 0;
+    }
+  }
+
+  clearNotifications(): void {
+    this.notifications = [];
+    this.newNotificationCount = 0;
   }
 
   private initForms(): void {
-    // Formulario de usuario
     this.userForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
       lastname: ['', [Validators.required, Validators.minLength(2)]],
@@ -168,7 +213,6 @@ export class AdminComponent implements OnInit {
     this.userForm.controls['password'].updateValueAndValidity();
   }
 
-  // Métodos de utilidad
   filterUsers(): Usuario[] {
     return this.users.filter(user => 
       user.name.toLowerCase().includes(this.filterText.toLowerCase()) ||
