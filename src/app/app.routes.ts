@@ -9,6 +9,7 @@ import { AuthGuard } from './AuthGuard/auth.guard';
 import { temperaturaComponent } from './Pages/Temperatura/temperatura.component';
 import { LuzComponent } from './Pages/Luz/luz.component';
 import { HumedadComponent } from './Pages/Humedad/humedad.component';
+import { GestionCamasComponent } from './Pages/gestion-camas/gestion-camas.component';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
@@ -17,7 +18,7 @@ export const routes: Routes = [
     { path: 'temperatura', component: temperaturaComponent},
     { path: 'luz', component: LuzComponent},
     { path: 'humedad', component: HumedadComponent},
-
+    { path: 'Gestion-camas', component: GestionCamasComponent},
     
 
 

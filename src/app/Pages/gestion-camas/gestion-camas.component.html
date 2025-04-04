@@ -1,0 +1,428 @@
+<div class="bg-[#E5DCD3] min-h-screen flex">
+  <!-- Sidebar -->
+  <app-sideAdmin class="fixed left-0 top-0 h-full z-10"></app-sideAdmin>
+
+  <!-- Contenido principal -->
+  <div class="flex-1 flex flex-col ml-[192px]">
+    <!-- Navbar superior -->
+    <nav class="bg-[#4C270A] py-4 px-6 flex items-center justify-between sticky top-0 z-10">
+      <div class="flex-1"></div>
+      <h1 class="text-white text-2xl font-bold text-center flex-1">GESTIÓN DE CAMAS</h1>
+      <div class="flex-1 flex justify-end">
+        <img src="assets/logo2.png" alt="Logo" class="h-12">
+      </div>
+    </nav>
+
+    <!-- Contenido -->
+    <div class="flex-1 p-4 md:p-8">
+      <div class="container mx-auto">
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+          <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Gestión de Camas</h1>
+          <div class="flex gap-2 w-full md:w-auto">
+            <button 
+              (click)="openAddTipoModal()"
+              class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 md:px-4 md:py-2 rounded-lg transition text-sm md:text-base"
+            >
+              Agregar Tipo
+            </button>
+            <button 
+              (click)="openAddCamaModal()"
+              class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 md:px-4 md:py-2 rounded-lg transition text-sm md:text-base"
+            >
+              Agregar Cama
+            </button>
+            <button 
+              (click)="openAddAlmacenModal()"
+              class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 md:px-4 md:py-2 rounded-lg transition text-sm md:text-base"
+            >
+              Agregar al Almacén
+            </button>
+          </div>
+        </div>
+        
+        <!-- Sección de Almacén -->
+        <div class="mb-6 bg-white p-4 rounded-lg shadow">
+          <h2 class="text-xl font-bold mb-4">Inventario del Almacén</h2>
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo de Cama</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr *ngFor="let almacen of almacenes" class="hover:bg-gray-50">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="font-medium text-gray-900">{{ almacen.tipo_cama_id ? getTipoNombre(almacen.tipo_cama_id) : 'Desconocido' }}</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                      [class.bg-green-100]="almacen.cantidad > 5"
+                      [class.text-green-800]="almacen.cantidad > 5"
+                      [class.bg-yellow-100]="almacen.cantidad <= 5 && almacen.cantidad > 0"
+                      [class.text-yellow-800]="almacen.cantidad <= 5 && almacen.cantidad > 0"
+                      [class.bg-red-100]="almacen.cantidad === 0"
+                      [class.text-red-800]="almacen.cantidad === 0">
+                      {{ almacen.cantidad }} unidades
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <button 
+                      (click)="openIncrementModal(almacen)"
+                      class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded"
+                    >
+                      Aumentar Stock
+                    </button>
+                  </td>
+                </tr>
+                <tr *ngIf="almacenes.length === 0">
+                  <td colspan="3" class="px-6 py-4 text-center text-sm text-gray-500">
+                    No hay registros en el almacén
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tabla de Camas -->
+        <div class="overflow-x-auto bg-white rounded-lg shadow">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Modelo</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr *ngFor="let cama of filteredCamass" class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="font-medium text-gray-900">{{ cama.modelo }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-gray-600">{{ cama.tipo_id ? getTipoNombre(cama.tipo_id) : 'Desconocido' }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                    [class.bg-green-100]="getStockByTipo(cama.tipo_id) > 5"
+                    [class.text-green-800]="getStockByTipo(cama.tipo_id) > 5"
+                    [class.bg-yellow-100]="getStockByTipo(cama.tipo_id) <= 5 && getStockByTipo(cama.tipo_id) > 0"
+                    [class.text-yellow-800]="getStockByTipo(cama.tipo_id) <= 5 && getStockByTipo(cama.tipo_id) > 0"
+                    [class.bg-red-100]="getStockByTipo(cama.tipo_id) === 0"
+                    [class.text-red-800]="getStockByTipo(cama.tipo_id) === 0">
+                    {{ cama.tipo_id ? getStockByTipo(cama.tipo_id) : 0 }} unidades
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <div class="flex gap-2">
+                    <button 
+                      (click)="editCama(cama)"
+                      class="text-blue-600 hover:text-blue-900 px-2 py-1 border border-blue-600 rounded hover:bg-blue-50"
+                    >
+                      Editar
+                    </button>
+                    <button 
+                      (click)="deleteCama(cama.id)"
+                      class="text-red-600 hover:text-red-900 px-2 py-1 border border-red-600 rounded hover:bg-red-50"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="filteredCamass.length === 0">
+                <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500">
+                  No se encontraron camas
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Modal para agregar/editar cama -->
+        <div *ngIf="showCamaModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+              <h2 class="text-xl font-bold">{{ isEditing ? 'Editar Cama' : 'Agregar Cama' }}</h2>
+              <button 
+                (click)="closeCamaModal()"
+                class="text-gray-500 hover:text-gray-700"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <form [formGroup]="camaForm" (ngSubmit)="onSubmitCama()" class="space-y-4">
+              <!-- Modelo -->
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-1">Modelo *</label>
+                <input 
+                  type="text" 
+                  formControlName="modelo"
+                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  [class.border-red-500]="camaForm.get('modelo')?.invalid && camaForm.get('modelo')?.touched"
+                >
+                <div *ngIf="camaForm.get('modelo')?.invalid && camaForm.get('modelo')?.touched" class="text-red-500 text-xs mt-1">
+                  <span *ngIf="camaForm.get('modelo')?.errors?.['required']">El modelo es requerido</span>
+                  <span *ngIf="camaForm.get('modelo')?.errors?.['minlength']">Mínimo 3 caracteres</span>
+                </div>
+              </div>
+              
+              <!-- Tipo de Cama -->
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-1">Tipo de Cama *</label>
+                <select 
+                  formControlName="tipo_id"
+                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  [class.border-red-500]="camaForm.get('tipo_id')?.invalid && camaForm.get('tipo_id')?.touched"
+                >
+                  <option value="">Seleccione un tipo</option>
+                  <option *ngFor="let tipo of tiposCama" [value]="tipo.id">
+                    {{ tipo.nombre }} (Stock: {{ getStockByTipo(tipo.id) }})
+                  </option>
+                </select>
+                <div *ngIf="camaForm.get('tipo_id')?.invalid && camaForm.get('tipo_id')?.touched" class="text-red-500 text-xs mt-1">
+                  Debes seleccionar un tipo de cama
+                </div>
+              </div>
+              
+              <!-- Asignación a Usuario -->
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-1">Asignar a Usuario (Opcional)</label>
+                <select 
+                  formControlName="usuario_id"
+                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option [value]="null">No asignar</option>
+                  <option *ngFor="let usuario of usuarios" [value]="usuario.id">
+                    {{ usuario.name }} {{ usuario.lastname }} ({{ usuario.email }})
+                  </option>
+                </select>
+              </div>
+              
+              <div class="flex justify-end gap-2 pt-4">
+                <button 
+                  type="button" 
+                  (click)="closeCamaModal()"
+                  class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded transition"
+                >
+                  Cancelar
+                </button>
+                <button 
+                  type="submit" 
+                  [disabled]="camaForm.invalid"
+                  class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {{ isEditing ? 'Actualizar' : 'Guardar' }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Modal para agregar tipo de cama -->
+        <div *ngIf="showTipoModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+              <h2 class="text-xl font-bold">Agregar Tipo de Cama</h2>
+              <button 
+                (click)="closeTipoModal()"
+                class="text-gray-500 hover:text-gray-700"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <form [formGroup]="tipoCamaForm" (ngSubmit)="onSubmitTipoCama()" class="space-y-4">
+              <!-- Nombre -->
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-1">Nombre *</label>
+                <input 
+                  type="text" 
+                  formControlName="nombre"
+                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  [class.border-red-500]="tipoCamaForm.get('nombre')?.invalid && tipoCamaForm.get('nombre')?.touched"
+                >
+                <div *ngIf="tipoCamaForm.get('nombre')?.invalid && tipoCamaForm.get('nombre')?.touched" class="text-red-500 text-xs mt-1">
+                  <span *ngIf="tipoCamaForm.get('nombre')?.errors?.['required']">El nombre es requerido</span>
+                  <span *ngIf="tipoCamaForm.get('nombre')?.errors?.['minlength']">Mínimo 3 caracteres</span>
+                </div>
+              </div>
+              
+              <!-- Clima -->
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-1">Clima *</label>
+                <input 
+                  type="text" 
+                  formControlName="clima"
+                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  [class.border-red-500]="tipoCamaForm.get('clima')?.invalid && tipoCamaForm.get('clima')?.touched"
+                >
+                <div *ngIf="tipoCamaForm.get('clima')?.invalid && tipoCamaForm.get('clima')?.touched" class="text-red-500 text-xs mt-1">
+                  <span *ngIf="tipoCamaForm.get('clima')?.errors?.['required']">El clima es requerido</span>
+                </div>
+              </div>
+              
+              <div class="flex justify-end gap-2 pt-4">
+                <button 
+                  type="button" 
+                  (click)="closeTipoModal()"
+                  class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded transition"
+                >
+                  Cancelar
+                </button>
+                <button 
+                  type="submit" 
+                  [disabled]="tipoCamaForm.invalid"
+                  class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Guardar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Modal para agregar al almacén -->
+        <div *ngIf="showAlmacenModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+              <h2 class="text-xl font-bold">Agregar al Almacén</h2>
+              <button 
+                (click)="closeAlmacenModal()"
+                class="text-gray-500 hover:text-gray-700"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <form [formGroup]="almacenForm" (ngSubmit)="onSubmitAlmacen()" class="space-y-4">
+              <!-- Tipo de Cama -->
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-1">Tipo de Cama *</label>
+                <select 
+                  formControlName="tipo_cama_id"
+                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  [class.border-red-500]="almacenForm.get('tipo_cama_id')?.invalid && almacenForm.get('tipo_cama_id')?.touched"
+                >
+                  <option value="">Seleccione un tipo</option>
+                  <option *ngFor="let tipo of tiposCama" [value]="tipo.id">
+                    {{ tipo.nombre }}
+                  </option>
+                </select>
+                <div *ngIf="almacenForm.get('tipo_cama_id')?.invalid && almacenForm.get('tipo_cama_id')?.touched" class="text-red-500 text-xs mt-1">
+                  Debes seleccionar un tipo de cama
+                </div>
+              </div>
+              
+              <!-- Cantidad -->
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-1">Cantidad *</label>
+                <input 
+                  type="number" 
+                  formControlName="cantidad"
+                  min="1"
+                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  [class.border-red-500]="almacenForm.get('cantidad')?.invalid && almacenForm.get('cantidad')?.touched"
+                >
+                <div *ngIf="almacenForm.get('cantidad')?.invalid && almacenForm.get('cantidad')?.touched" class="text-red-500 text-xs mt-1">
+                  <span *ngIf="almacenForm.get('cantidad')?.errors?.['required']">La cantidad es requerida</span>
+                  <span *ngIf="almacenForm.get('cantidad')?.errors?.['min']">La cantidad mínima es 1</span>
+                </div>
+              </div>
+              
+              <div class="flex justify-end gap-2 pt-4">
+                <button 
+                  type="button" 
+                  (click)="closeAlmacenModal()"
+                  class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded transition"
+                >
+                  Cancelar
+                </button>
+                <button 
+                  type="submit" 
+                  [disabled]="almacenForm.invalid"
+                  class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded transition disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Guardar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Modal para incrementar stock -->
+        <div *ngIf="showIncrementModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+              <h2 class="text-xl font-bold">Aumentar Stock</h2>
+              <button 
+                (click)="closeIncrementModal()"
+                class="text-gray-500 hover:text-gray-700"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <form [formGroup]="incrementForm" (ngSubmit)="onSubmitIncrement()" class="space-y-4">
+              <div class="mb-4">
+                <p class="text-gray-700">Tipo de cama: 
+                  <span class="font-semibold">{{ currentAlmacen ? getTipoNombre(currentAlmacen.tipo_cama_id) : 'Desconocido' }}</span>
+                </p>
+                <p class="text-gray-700">Stock actual: 
+                  <span class="font-semibold">{{ currentAlmacen?.cantidad ?? 0 }} unidades</span>
+                </p>
+              </div>
+              
+              <!-- Cantidad -->
+              <div>
+                <label class="block text-gray-700 text-sm font-bold mb-1">Cantidad a agregar *</label>
+                <input 
+                  type="number" 
+                  formControlName="cantidad"
+                  min="1"
+                  class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  [class.border-red-500]="incrementForm.get('cantidad')?.invalid && incrementForm.get('cantidad')?.touched"
+                >
+                <div *ngIf="incrementForm.get('cantidad')?.invalid && incrementForm.get('cantidad')?.touched" class="text-red-500 text-xs mt-1">
+                  <span *ngIf="incrementForm.get('cantidad')?.errors?.['required']">La cantidad es requerida</span>
+                  <span *ngIf="incrementForm.get('cantidad')?.errors?.['min']">La cantidad mínima es 1</span>
+                </div>
+              </div>
+              
+              <div class="flex justify-end gap-2 pt-4">
+                <button 
+                  type="button" 
+                  (click)="closeIncrementModal()"
+                  class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded transition"
+                >
+                  Cancelar
+                </button>
+                <button 
+                  type="submit" 
+                  [disabled]="incrementForm.invalid"
+                  class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Aumentar Stock
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
