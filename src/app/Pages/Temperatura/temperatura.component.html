@@ -3,61 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Humedad - C.A.F</title>
+    <title>Temperatura - C.A.F</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/primeng/resources/themes/lara-light-indigo/theme.css" />
+    <link rel="stylesheet" href="https://unpkg.com/primeng/resources/primeng.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/primeicons/primeicons.css" />
 </head>
 <body class="bg-[#E5DCD3] flex h-screen m-0">
-    <!-- Sidebar -->
     <app-sidebar class="fixed left-0 top-0 h-full"></app-sidebar>
 
-    <!-- Contenedor Principal -->
     <div class="flex-1 flex flex-col min-h-screen ml-48">
-        <!-- Navegación Superior -->
         <nav class="bg-[#351F0A] py-4 px-6 flex items-center justify-between">
             <img src="assets/logo2.png" alt="Logo" class="h-12">
             <h1 class="text-white text-2xl font-bold text-center flex-1">MONITOR DE TEMPERATURA</h1>
+            <div class="text-white text-sm">
+                Estado: {{connectionStatus}} | Mensajes: {{messageCount}}
+            </div>
         </nav>
 
-        <!-- Contenido Principal -->
         <div class="flex-1 p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Panel Humedad Actual -->
+            <!-- Panel Temperatura Actual -->
             <div class="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center justify-center border border-[#4C270A]/20">
-                <h2 class="text-xl font-bold mb-4 text-[#4C270A]">Temperatura actual</h2>
-                <div class="text-5xl font-bold text-[#4C270A] mb-2">{{currentHumidity}}%</div>
+                <h2 class="text-xl font-bold mb-4 text-[#4C270A]">Temperatura Actual</h2>
+                <div class="text-5xl font-bold text-[#4C270A] mb-2">{{currentTemperature | number:'1.1-1'}}°C</div>
                 <div class="text-lg px-4 py-2 rounded-full 
-                    {{status === 'Óptima' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}}">
+                    {{status === 'Óptima' ? 'bg-green-100 text-green-800' : 
+                      status === 'Baja' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}}">
                     {{status}}
                 </div>
+                <div class="text-sm text-gray-500 mt-2">Última actualización: {{lastUpdateTime}}</div>
             </div>
 
             <!-- Panel Rango Ideal -->
             <div class="bg-white rounded-xl shadow-lg p-6 flex flex-col items-center justify-center border border-[#4C270A]/20">
                 <h2 class="text-xl font-bold mb-4 text-[#4C270A]">Rango Ideal</h2>
                 <div class="text-3xl font-bold text-[#4C270A]">
-                    {{idealHumidityRange.min}}% - {{idealHumidityRange.max}}%
+                    {{idealTemperatureRange.min}}°C - {{idealTemperatureRange.max}}°C
                 </div>
                 <div class="w-full mt-6">
                     <div class="flex justify-between text-sm text-gray-600 mb-1">
-                        <span>50%</span>
-                        <span>80%</span>
+                        <span>15°C</span>
+                        <span>30°C</span>
                     </div>
                     <div class="w-full bg-gray-200 rounded-full h-4">
                         <div class="bg-[#4C270A] h-4 rounded-full" 
-                            [style.width]="((currentHumidity - 50) / 30 * 100) + '%'"></div>
+                            [style.width]="((currentTemperature - 15) / 15 * 100) + '%'"></div>
+                    </div>
+                    <div class="flex justify-between mt-1">
+                        <span class="text-xs text-green-600">{{idealTemperatureRange.min}}°C</span>
+                        <span class="text-xs text-green-600">{{idealTemperatureRange.max}}°C</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Gráfica - Contenedor con altura fija -->
-            <div class="lg:col-span-2 bg-white rounded-xl shadow-lg p-6 border border-[#4C270A]/20 h-[400px]">
-                <div class="chart-container h-full">
-                  <canvas baseChart
-                          [data]="humidityChartData"
-                          [options]="chartOptions"
-                          [type]="'line'">
-                  </canvas>
-                </div>
-              </div>
+            <!-- Gráfica PrimeNG -->
+            <div class="lg:col-span-2 bg-white rounded-xl shadow-lg p-6 border border-[#4C270A]/20">
+                <h2 class="text-xl font-bold mb-4 text-[#4C270A] text-center">MONITOREO DE TEMPERATURA - ÚLTIMAS 24 HORAS</h2>
+                <p-chart type="line" 
+                        [data]="temperatureChartData" 
+                        [options]="chartOptions"
+                        [style]="{width: '100%', height: '400px'}">
+                </p-chart>
+            </div>
         </div>
     </div>
 </body>

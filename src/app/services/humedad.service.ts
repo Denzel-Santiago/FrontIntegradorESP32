@@ -1,47 +1,85 @@
-// humedad.service.ts
-import { Injectable } from '@angular/core';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { Humedad } from '../interfaces/humedad.interface';  // Asegúrate de importar la interfaz
+import { Injectable, OnDestroy } from '@angular/core';
+import { Observable, BehaviorSubject, Subject, throwError } from 'rxjs';
+import { catchError, filter, retryWhen, take } from 'rxjs/operators';
+import { Humedad } from '../interfaces/humedad.interface';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
-export class TemperatureService {
-  private socket: WebSocket | null = null; 
-  private temperatureSubject: BehaviorSubject<Humedad | null> = new BehaviorSubject<Humedad | null>(null);
+export class HumedadService implements OnDestroy {
+  private socket!: WebSocket;
+  private messageSubject: Subject<Humedad> = new Subject();
+  private connectionStatusSubject = new BehaviorSubject<boolean>(false);
+  private readonly reconnectAttempts = 5;
+  private readonly reconnectDelay = 5000; // 5 segundos
 
   constructor() {
-    this.connectToWebSocket();
+    this.connect();
   }
 
-  // Conectar al WebSocket
-  private connectToWebSocket(): void {
-    this.socket = new WebSocket('ws://localhost:8002/ws');  // Dirección del WebSocket en el servidor
+  private connect(): void {
+      try {
+        this.socket = new WebSocket('ws://localhost:8002/ws');
+  
+        this.socket.onopen = () => {
+          console.log('WebSocket connection established');
+        };
+  
+        this.socket.onmessage = (event) => {
+          try {
+            const data: Humedad = JSON.parse(event.data);
+            this.messageSubject.next(data);
+          } catch (error) {
+            console.error('Error parsing WebSocket message:', error);
+          }
+        };
+  
+        this.socket.onerror = (error) => {
+          console.error('WebSocket Error:', error);
+        };
+  
+        this.socket.onclose = (event) => {
+          console.log('WebSocket connection closed', event);
+          if (!event.wasClean) {
+            this.attemptReconnection();
+          }
+        };
+      } catch (error) {
+        console.error('WebSocket initialization error:', error);
+      }
+    }
 
-    // Al recibir un mensaje del WebSocket
-    this.socket.onmessage = (event) => {
-      const temperature: Humedad = JSON.parse(event.data);
-      this.temperatureSubject.next(temperature);
-    };
+    private attemptReconnection(): void {
+      let attempts = 0;
+      
+      const tryReconnect = () => {
+        attempts++;
+        if (attempts <= this.reconnectAttempts) {
+          console.log(`Attempting to reconnect (${attempts}/${this.reconnectAttempts})...`);
+          setTimeout(() => {
+            this.connect();
+          }, this.reconnectDelay);
+        } else {
+          console.error('Max reconnection attempts reached');
+        }
+      };
+  
+      tryReconnect();
+    }
 
-    // Manejar los errores de la conexión
-    this.socket.onerror = (error) => {
-      console.error('WebSocket error:', error);
-    };
-
-    // Cerrar la conexión del WebSocket
-    this.socket.onclose = () => {
-      console.log('WebSocket connection closed');
-    };
+   getMessages(): Observable<Humedad> {
+      return this.messageSubject.asObservable().pipe(
+        catchError(error => {
+          console.error('Error in message stream:', error);
+          return throwError(error);
+        })
+      );
+    }
+  getConnectionStatus(): Observable<boolean> {
+    return this.connectionStatusSubject.asObservable();
   }
 
-  // Obtener los datos de la temperatura
-  getCurrentTemperature(): Observable<Humedad | null> {
-    return this.temperatureSubject.asObservable();
-  }
-
-  // Cerrar WebSocket manualmente cuando se destruya el servicio
-  closeWebSocket(): void {
+  ngOnDestroy(): void {
     if (this.socket) {
       this.socket.close();
     }
