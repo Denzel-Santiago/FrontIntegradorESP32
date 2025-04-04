@@ -1,18 +1,118 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common'; // Asegúrate de importar esto
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { AlmacenService } from '../../services/almacen.service';
+import { Almacen } from '../../interfaces/almacen.interface';
+import { OrderService } from '../../services/order.service';
+import { OrderCreate, OrderResponse } from '../../interfaces/order.interface';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
     selector: 'app-ventas',
     templateUrl: './ventas.component.html',
-    styleUrls: ['./ventas.component.css'], // Solo si es un componente standalone
     standalone: true,
-    imports: [CommonModule] // Solo si es un componente standalone
+    imports: [CommonModule, ReactiveFormsModule]
 })
-export class VentasComponent {
+export class VentasComponent implements OnInit {
   isModalOpen: boolean = false;
+  isPurchaseModalOpen: boolean = false;
   modalContent: any = {};
+  almacenes: Almacen[] = [];
+  loading: boolean = true;
+  orderForm: FormGroup;
+  currentProduct: any = null;
+  orderSuccess: boolean = false;
+  orderError: boolean = false;
 
-  // Datos para cada modal
+  constructor(
+    private almacenService: AlmacenService,
+    private orderService: OrderService,
+    private fb: FormBuilder
+  ) {
+    this.orderForm = this.fb.group({
+      name: ['', Validators.required],
+      last_name: ['', Validators.required],
+      phone: ['', [Validators.required, Validators.pattern(/^[0-9]{10}$/)]],
+      email: ['', [Validators.required, Validators.email]],
+      quantity: [1, [Validators.required, Validators.min(1)]],
+      bed_name: ['', Validators.required]
+    });
+  }
+
+  ngOnInit(): void {
+    this.loadAlmacenes();
+  }
+
+  loadAlmacenes(): void {
+    this.almacenService.getAllAlmacenes().subscribe({
+      next: (data) => {
+        this.almacenes = data.slice(0, 2);
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error al cargar almacenes:', error);
+        this.loading = false;
+      }
+    });
+  }
+
+  getImageForTipoCama(tipoId: number): string {
+    return tipoId === 1 ? 'assets/ventas5.png' : 'assets/ventas6.png';
+  }
+
+  getNombreTipoCama(tipoId: number): string {
+    return tipoId === 1 ? 'Modelo Estándar' : 'Modelo Automático';
+  }
+
+  getPrecioTipoCama(tipoId: number): string {
+    return tipoId === 1 ? '10,000$' : '12,000$';
+  }
+
+  openModal(productId: number): void {
+    this.modalContent = this.productsInfo.find(product => product.id === productId);
+    this.isModalOpen = true;
+    document.body.style.overflow = 'hidden';
+  }
+
+  openPurchaseModal(almacen: Almacen): void {
+    this.currentProduct = almacen;
+    this.orderForm.patchValue({
+      bed_name: this.getNombreTipoCama(almacen.tipo_cama_id),
+      quantity: 1
+    });
+    this.isPurchaseModalOpen = true;
+    document.body.style.overflow = 'hidden';
+  }
+
+  closeModal(): void {
+    this.isModalOpen = false;
+    this.isPurchaseModalOpen = false;
+    this.orderSuccess = false;
+    this.orderError = false;
+    document.body.style.overflow = 'auto';
+  }
+
+  submitOrder(): void {
+    if (this.orderForm.invalid) {
+      this.orderForm.markAllAsTouched();
+      return;
+    }
+
+    const orderData: OrderCreate = this.orderForm.value;
+    this.orderService.createOrder(orderData).subscribe({
+      next: (response: OrderResponse) => {
+        console.log('Pedido creado exitosamente:', response);
+        this.orderSuccess = true;
+        this.orderError = false;
+        this.orderForm.reset();
+      },
+      error: (error) => {
+        console.error('Error al crear el pedido:', error);
+        this.orderError = true;
+        this.orderSuccess = false;
+      }
+    });
+  }
+
   productsInfo = [
     {
       id: 1,
@@ -25,38 +125,6 @@ export class VentasComponent {
         'Proyecto en calidad, potencia al servicio y acceso de las más frecuentes salidas federales y que se pueden producir su uso productivo.'
       ]
     },
-    {
-      id: 2,
-      title: 'Cama Africana Para Secado De Café – Modelo Estándar',
-      image: 'assets/ventas3.png',
-      description: [
-        'Este modelo de la máquina del sistema estén de carreteros de un sistema de transporte con determinados datos más generales de España de tiempo.',
-        'En este ámbito, los 13 camas de secado de la mayoría de 10 años están diseñados como el estado de secado de la mayoría de 100 años, desde que se encuentra establecido en el 2009, cualquiera que debido bien es necesario.',
-        'Hacerse otras mismas está diseñada para aprobarlas un espacio uniforme y eficiente. No hay gustos de vida que ya existen de brillando con la normalidad de todos, pero ninguna hermana lo hace no descansar.'
-      ]
-    },
-    {
-      id: 3,
-      title: 'La Revolución Del Secado De Café - Cama Africana Inteligente',
-      image: 'assets/ventas4.png',
-      description: [
-        'Para la preparación de café si siguiente será una nuestra alta funcionalidad de tiempo, todo el día deberá entender qué puede.',
-        'Con nuestro "estudante" contrato, su propósito también es la base del proceso, especialmente la técnica adicional de café.',
-        'Nuestra obra hipotética es consolidada por cuenta Sistema de Transporte y Administración General de Firma administrativa, así como la información de esta obra.',
-        'El proyecto de comunicación personal, la realización de secado de la mayoría de 10 años, es importante mejorar la actualización de actividades.',
-        'Unico a la mano por del secado de café y deben resultados profesionales con nuevos asociados premium.'
-      ]
-    }
+    // ... otros productos
   ];
-
-  openModal(productId: number): void {
-    this.modalContent = this.productsInfo.find(product => product.id === productId);
-    this.isModalOpen = true;
-    document.body.style.overflow = 'hidden';
-  }
-
-  closeModal(): void {
-    this.isModalOpen = false;
-    document.body.style.overflow = 'auto';
-  }
 }
