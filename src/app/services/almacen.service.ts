@@ -8,7 +8,7 @@ import { Almacen, AlmacenCreate, IncrementarCantidad } from '../interfaces/almac
   providedIn: 'root'
 })
 export class AlmacenService {
-  private apiUrl = 'http://localhost:8000/almacen/';
+  private apiUrl = 'http://54.82.122.162:8000/almacen/';
 
   constructor(private http: HttpClient) { }
 

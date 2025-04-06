@@ -15,7 +15,7 @@ import {
   providedIn: 'root'
 })
 export class UsuarioService {
-  private apiUrl = 'http://localhost:8000/usuarios/';
+  private apiUrl = 'http://54.82.122.162:8000/usuarios/';
   private currentUserSubject: BehaviorSubject<{user: Usuario | null, token: string | null}>;
   public currentUser$: Observable<{user: Usuario | null, token: string | null}>;
 

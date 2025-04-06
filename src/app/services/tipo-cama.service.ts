@@ -13,7 +13,7 @@ import {
   providedIn: 'root'
 })
 export class TipoCamaService {
-  private apiUrl = 'http://localhost:8000/tipos-cama/';
+  private apiUrl = 'http://54.82.122.162:8000/tipos-cama/';
 
   constructor(private http: HttpClient) { }
 

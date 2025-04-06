@@ -14,7 +14,7 @@ import {
   providedIn: 'root'
 })
 export class MembresiaService {
-  private apiUrl = 'http://localhost:8000/membresias/';
+  private apiUrl = 'http://54.82.122.162:8000/membresias/';
 
   constructor(private http: HttpClient) { }
 

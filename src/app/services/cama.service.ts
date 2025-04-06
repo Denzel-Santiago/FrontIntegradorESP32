@@ -14,8 +14,8 @@ import {
   providedIn: 'root'
 })
 export class CamaService {
-  private apiUrl = 'http://localhost:8000/camas/';
-  private apiUrlAfricana = 'http://localhost:8000/camas-africanas/';
+  private apiUrl = 'http://54.82.122.162:8000/camas/';
+  private apiUrlAfricana = 'http://54.82.122.162:8000/camas-africanas/';
 
   constructor(private http: HttpClient) { }
 
