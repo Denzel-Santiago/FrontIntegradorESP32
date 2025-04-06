@@ -1,77 +1,87 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { WebSocketSubject, webSocket } from 'rxjs/webSocket';
-import { Observable, BehaviorSubject, throwError } from 'rxjs';
-import { catchError, retryWhen, delay, tap, take } from 'rxjs/operators';
+import { Observable, BehaviorSubject, Subject, throwError } from 'rxjs';
+import { catchError, filter, retryWhen, take } from 'rxjs/operators';
 import { Luz } from '../interfaces/luz.interface';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LuzService implements OnDestroy {
-  private socket$: WebSocketSubject<Luz> | null = null;
-  private luzSubject = new BehaviorSubject<Luz | null>(null);
-  private reconnectAttempts = 5;
-  private reconnectDelay = 5000;
-  private isDestroyed = false;
-
+ private socket!: WebSocket;
+   private messageSubject: Subject<Luz> = new Subject();
+   private connectionStatusSubject = new BehaviorSubject<boolean>(false);
+   private readonly reconnectAttempts = 5;
+   private readonly reconnectDelay = 5000; // 5 segundos
+ 
   constructor() {
     this.connect();
   }
 
   private connect(): void {
-    if (this.isDestroyed) return;
-
-    this.socket$ = webSocket<Luz>({
-      url: 'ws://localhost:8003/ws',
-      closeObserver: {
-        next: () => {
-          console.log('Luz WebSocket connection closed');
-          if (!this.isDestroyed) this.attemptReconnection();
+        try {
+          this.socket = new WebSocket('ws://localhost:8003/ws');
+    
+          this.socket.onopen = () => {
+            console.log('WebSocket connection established');
+          };
+    
+          this.socket.onmessage = (event) => {
+            try {
+              const data: Luz = JSON.parse(event.data);
+              this.messageSubject.next(data);
+            } catch (error) {
+              console.error('Error parsing WebSocket message:', error);
+            }
+          };
+    
+          this.socket.onerror = (error) => {
+            console.error('WebSocket Error:', error);
+          };
+    
+          this.socket.onclose = (event) => {
+            console.log('WebSocket connection closed', event);
+            if (!event.wasClean) {
+              this.attemptReconnection();
+            }
+          };
+        } catch (error) {
+          console.error('WebSocket initialization error:', error);
         }
-      },
-      openObserver: {
-        next: () => console.log('Luz WebSocket connection established')
       }
-    });
-
-    this.socket$.pipe(
-      retryWhen(errors => errors.pipe(
-        tap(err => console.error('Luz WebSocket error, retrying...', err)),
-        delay(this.reconnectDelay),
-        take(this.reconnectAttempts)
-      )),
-      catchError(err => {
-        console.error('Luz WebSocket connection failed:', err);
-        return throwError(() => err);
-      })
-    ).subscribe({
-      next: (data: Luz) => this.luzSubject.next(data),
-      error: (err) => this.luzSubject.error(err),
-      complete: () => console.log('Luz WebSocket completed')
-    });
-  }
-
-  private attemptReconnection(): void {
-    if (this.isDestroyed) return;
-    console.log(`Attempting to reconnect in ${this.reconnectDelay/1000} seconds...`);
-    setTimeout(() => this.connect(), this.reconnectDelay);
-  }
-
-  getCurrentLuz(): Observable<Luz | null> {
-    return this.luzSubject.asObservable();
-  }
-
-  sendMessage(message: any): void {
-    if (this.socket$ && !this.socket$.closed) {
-      this.socket$.next(message);
-    } else {
-      console.error('Cannot send message - WebSocket not connected');
+  
+      private attemptReconnection(): void {
+        let attempts = 0;
+        
+        const tryReconnect = () => {
+          attempts++;
+          if (attempts <= this.reconnectAttempts) {
+            console.log(`Attempting to reconnect (${attempts}/${this.reconnectAttempts})...`);
+            setTimeout(() => {
+              this.connect();
+            }, this.reconnectDelay);
+          } else {
+            console.error('Max reconnection attempts reached');
+          }
+        };
+    
+        tryReconnect();
+      }
+  
+     getMessages(): Observable<Luz> {
+        return this.messageSubject.asObservable().pipe(
+          catchError(error => {
+            console.error('Error in message stream:', error);
+            return throwError(error);
+          })
+        );
+      }
+    getConnectionStatus(): Observable<boolean> {
+      return this.connectionStatusSubject.asObservable();
     }
-  }
-
-  ngOnDestroy(): void {
-    this.isDestroyed = true;
-    this.socket$?.complete();
-    this.luzSubject.complete();
-  }
+  
+    ngOnDestroy(): void {
+      if (this.socket) {
+        this.socket.close();
+      }
+    }
 }
