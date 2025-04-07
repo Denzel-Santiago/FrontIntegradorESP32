@@ -19,7 +19,7 @@ export class TemperatureService implements OnDestroy {
 
  private connect(): void {
        try {
-         this.socket = new WebSocket('ws://localhost:8001/ws');
+         this.socket = new WebSocket('ws://34.237.191.108:8001/ws');
    
          this.socket.onopen = () => {
            console.log('WebSocket connection established');

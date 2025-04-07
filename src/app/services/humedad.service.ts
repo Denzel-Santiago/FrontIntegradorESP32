@@ -19,7 +19,7 @@ export class HumedadService implements OnDestroy {
 
   private connect(): void {
       try {
-        this.socket = new WebSocket('ws://localhost:8002/ws');
+        this.socket = new WebSocket('ws://44.210.194.96:8002/ws');
   
         this.socket.onopen = () => {
           console.log('WebSocket connection established');

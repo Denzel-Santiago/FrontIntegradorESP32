@@ -19,7 +19,7 @@ export class LuzService implements OnDestroy {
 
   private connect(): void {
         try {
-          this.socket = new WebSocket('ws://localhost:8003/ws');
+          this.socket = new WebSocket('ws://44.212.103.182:8003/ws');
     
           this.socket.onopen = () => {
             console.log('WebSocket connection established');

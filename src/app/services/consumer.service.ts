@@ -19,7 +19,7 @@ export class ConsumerService implements OnDestroy {
 
   private connect(): void {
     try {
-      this.socket = new WebSocket('ws://localhost:8005/ws');
+      this.socket = new WebSocket('ws://3.86.136.69:8005/ws');
 
       this.socket.onopen = () => {
         console.log('WebSocket connection established');

@@ -13,7 +13,7 @@ import {
   providedIn: 'root'
 })
 export class OrderService {
-  private apiUrl = 'http://localhost:8004/api/order';
+  private apiUrl = 'http://34.201.232.188:8004/api/order';
 
   constructor(private http: HttpClient) { }
 
